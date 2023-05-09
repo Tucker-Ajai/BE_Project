@@ -56,7 +56,6 @@ describe("Get /api/categories", () => {
         return request(app).get("/api/categories").expect(500);
       })
       .then((response) => {
-        console.log(response.error.text);
         expect(response.error.text).toBe(
           "There is currently an issue witht the server. Please try again later"
         );
