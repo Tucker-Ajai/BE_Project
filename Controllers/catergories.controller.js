@@ -1,6 +1,6 @@
 const express = require("express");
-const { fetchCategories } = require("../Models/catergories.model");
 const app = express();
+const { fetchCategories } = require("../Models/catergories.model");
 
 exports.getCategories = (request, response,next) =>{
     fetchCategories().then((categories)=>{
