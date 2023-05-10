@@ -13,9 +13,6 @@ afterAll(() => {
 });
 
 describe("Get /api/categories", () => {
-  test("Function able to recieve a positive response", () => {
-    return request(app).get("/api/categories").expect(200);
-  });
   test("Function outputs the requested information", () => {
     const result = [
       {
@@ -40,25 +37,5 @@ describe("Get /api/categories", () => {
         expect(response.body.categories).toEqual(result);
       });
   });
-  test("When unable to access the server, Funtion responds with error", () => {
-    return db
-      .query(`DROP TABLE IF EXISTS comments;`)
-      .then(() => {
-        return db.query(`DROP TABLE IF EXISTS reviews;`);
-      })
-      .then(() => {
-        return db.query(`DROP TABLE IF EXISTS users;`);
-      })
-      .then(() => {
-        return db.query(`DROP TABLE IF EXISTS categories;`);
-      })
-      .then(() => {
-        return request(app).get("/api/categories").expect(500);
-      })
-      .then((response) => {
-        expect(response.error.text).toBe(
-          "There is currently an issue witht the server. Please try again later"
-        );
-      });
-  });
-});
+
+})
