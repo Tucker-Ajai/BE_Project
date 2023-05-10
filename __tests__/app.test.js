@@ -37,5 +37,4 @@ describe("Get /api/categories", () => {
         expect(response.body.categories).toEqual(result);
       });
   });
-
-})
+});
