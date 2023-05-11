@@ -4,6 +4,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const { response } = require("../app");
+const endpoints = require("../endpoints.json")
 
 beforeEach(() => {
   return seed(testData);
@@ -44,8 +45,7 @@ describe("Get /api/categories", () => {
         .get("/api")
         .expect(200)
         .then((response) => {
-          console.log(Object.keys(response.body))
-          expect(Object.keys(response.body).includes('GET /api')).toBe(true)
+          expect(endpoints).toEqual(response.body)
 
         });
     });

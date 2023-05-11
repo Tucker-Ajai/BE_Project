@@ -1,10 +1,9 @@
 const express = require("express");
-const { fetchApi } = require("../Models/api.model");
-
 const app = express();
+const endpoint = require("../endpoints.json");
+
 
 exports.getApi = (request, response, next) => {
-  
-    response.status(200).send(fetchApi());
+    response.status(200).send(endpoint);
   };
 ;
