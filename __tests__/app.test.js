@@ -13,7 +13,7 @@ afterAll(() => {
   return db.end();
 });
 
-describe("Get /api/categories", () => {
+describe("3. Get /api/categories", () => {
   test("Function outputs the requested information", () => {
     const result = [
       {
@@ -51,3 +51,44 @@ describe("Get /api/categories", () => {
     });
   });
 });
+
+describe("4. GET /api/reviews/:review_id", () => {
+  test("Function gives requested information when given the correct ID", () => {
+    result = {
+      review_id: 1,
+      title: "Agricola",
+      category: "euro game",
+      designer: "Uwe Rosenberg",
+      owner: "mallionaire",
+      review_body: "Farmyard fun!",
+      review_img_url:
+        "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+      created_at: "2021-01-18T10:00:20.514Z",
+      votes: 1,
+    };
+
+    return request(app)
+      .get("/api/reviews/1")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(result);
+      });
+  });
+  test("When user submits query that does not consist of ONLY numbers Function sends back an error", () => {
+    return request(app)
+      .get("/api/reviews/2;DROP TABLE IF EXISTS reviews")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid review ID provided");
+      });
+  })
+test("When user submits a valid request but there is not a matching review ID, function to notify user",()=>{
+  
+  return request(app)
+  .get("/api/reviews/100")
+  .expect(200)
+  .then((response) => {
+    expect(response.body.msg).toBe("No matching review id");
+  });
+});
+})
