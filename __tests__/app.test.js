@@ -37,4 +37,17 @@ describe("Get /api/categories", () => {
         expect(response.body.categories).toEqual(result);
       });
   });
+
+  describe("3.5 GET /api", () => {
+    test("", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((response) => {
+          console.log(Object.keys(response.body))
+          expect(Object.keys(response.body).includes('GET /api')).toBe(true)
+
+        });
+    });
+  });
 });

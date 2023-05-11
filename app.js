@@ -1,15 +1,17 @@
 const express = require("express");
+const { getApi } = require("./Controllers/api.controller");
 const { getCategories } = require("./Controllers/catergories.controller");
 const app = express();
 app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
+app.get("/api", getApi)
+
 
 
 
 app.use((err, request, response, next) => {
-  console.log("see me")
   if (err.status && err.msg) {
     response.status(err.status).send({ msg: err.msg });
   } else {
