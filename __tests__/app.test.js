@@ -4,6 +4,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const { response } = require("../app");
+const toBeSortedBy = require('jest-sorted')
 
 beforeEach(() => {
   return seed(testData);
@@ -68,14 +69,39 @@ describe("4. GET /api/reviews/:review_id", () => {
       .then((response) => {
         expect(response.body.msg).toBe("Invalid review ID provided");
       });
-  })
-test("When user submits a valid request but there is not a matching review ID, function to notify user",()=>{
-  
-  return request(app)
-  .get("/api/reviews/100")
-  .expect(200)
-  .then((response) => {
-    expect(response.body.msg).toBe("No matching review id");
+  });
+  test("When user submits a valid request but there is not a matching review ID, function to notify user", () => {
+    return request(app)
+      .get("/api/reviews/100")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.msg).toBe("No matching review id");
+      });
   });
 });
+
+describe("5. GET /api/reviews", () => {
+  test("Function to recieve an object of arrays in descending date order", () => {
+    return request(app).get("/api/reviews").expect(200).then((response)=>{
+      expect(response.body).toBeSortedBy("created_at",{descending:true})
+    })
+
+  });
+  test("The received object does not include a review_body key", () => {
+    return request(app).get("/api/reviews").expect(200).then((response)=>{
+      expect(Object.keys(response.body[0]).includes("review_body")).toBe(false)
+  });
+})
+test("The received object does include a comment_count key", () => {
+  return request(app).get("/api/reviews").expect(200).then((response)=>{
+    expect(Object.keys(response.body[0]).includes("comment_count")).toBe(true)
+  })
+  
+})
+test("The function counts comments correctly", () => {
+  return request(app).get("/api/reviews").expect(200).then((response)=>{
+
+    expect(response.body[8].comment_count).toBe(3)
+  })
+})
 })
