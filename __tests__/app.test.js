@@ -86,7 +86,6 @@ describe("5. GET /api/reviews", () => {
       .get("/api/reviews")
       .expect(200)
       .then((response) => {
-        console.log(response.body.review.rows);
         expect(response.body.review.rows).toBeSortedBy("created_at", {
           descending: true,
         });
@@ -100,7 +99,6 @@ describe("5. GET /api/reviews", () => {
         const result = response.body.review.rows.filter(
           (obj) => obj.review_body
         );
-        console.log(result);
         expect(result).toEqual([]);
       });
   });
