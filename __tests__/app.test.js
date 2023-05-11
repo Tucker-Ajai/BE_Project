@@ -39,16 +39,18 @@ describe("3. Get /api/categories", () => {
       });
   });
 
-  describe("3.5 GET /api", () => {
-    test("", () => {
-      return request(app)
-        .get("/api")
-        .expect(200)
-        .then((response) => {
-          expect(endpoints).toEqual(response.body)
+ 
+});
 
-        });
-    });
+describe("3.5 GET /api", () => {
+  test("", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(endpoints).toEqual(response.body)
+
+      });
   });
 });
 
