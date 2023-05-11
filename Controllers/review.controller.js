@@ -1,5 +1,5 @@
 const express = require("express");
-const { fetchReview } = require("../Models/reviews.model");
+const { fetchReview, fetchReviewsComments } = require("../Models/reviews.model");
 const app = express();
 
 exports.getReview = (request, response, next) => {
@@ -11,3 +11,17 @@ exports.getReview = (request, response, next) => {
       next(err);
     });
 };
+
+exports.getReviewsComments = (request, response, next) => {
+  const id = request.params.review_id
+
+fetchReviewsComments(id).then((comments)=>{
+
+response.status(200).send({reviewComments:comments})
+}).catch((err) => {
+ // console.log(err)
+  next(err);
+});
+
+
+}

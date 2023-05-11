@@ -1,7 +1,7 @@
 const express = require("express");
 const { getApi } = require("./Controllers/api.controller");
 const { getCategories } = require("./Controllers/catergories.controller");
-const { getReview } = require("./Controllers/review.controller");
+const { getReview, getReviewsComments } = require("./Controllers/review.controller");
 const app = express();
 app.use(express.json());
 
@@ -11,6 +11,7 @@ app.get("/api", getApi)
 
 app.get("/api/reviews/:review_id", getReview)
 
+app.get("/api/reviews/:review_id/comments", getReviewsComments)
 
 
 
