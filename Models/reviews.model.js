@@ -19,26 +19,10 @@ exports.fetchReview = (id) => {
 };
 
 exports.fetchAllReviews = () => {
-  const promisOne = db.query(
-    `SELECT owner,title,review_id,category,review_img_url,created_at,votes,designer FROM reviews ORDER BY created_at DESC `
-  );
-  const promiseTwo = db.query(`SELECT review_id FROM comments `);
-  return Promise.all([promisOne, promiseTwo])
-    .then((reviews) => {
-      for (let i = 0; i < reviews[0].rows.length; i++) {
-        reviews[0].rows[i].comment_count = 0;
-      }
-      for (let t = 0; t < reviews[0].rows.length; t++) {
-        for (let z = 0; z < reviews[1].rows.length; z++) {
-          if (reviews[1].rows[z].review_id === reviews[0].rows[t].review_id) {
-            reviews[0].rows[t].comment_count++;
-          }
-        }
-      }
-
-      return reviews[0].rows;
-    })
-    .then((arrOfReviews) => {
+ return db.query(
+    `SELECT owner,title,reviews.review_id,category,review_img_url,reviews.created_at,reviews.votes,designer, COUNT(comments.review_id) AS comment_count FROM reviews left JOIN comments on reviews.review_id = comments.review_id group by reviews.review_id ORDER BY created_at DESC `
+  ).then((arrOfReviews) => {
+    //console.log(arrOfReviews.rows)
       return arrOfReviews;
     });
 };

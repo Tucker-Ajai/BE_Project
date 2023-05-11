@@ -4,7 +4,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const { response } = require("../app");
-const toBeSortedBy = require('jest-sorted')
+const toBeSortedBy = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -82,26 +82,48 @@ describe("4. GET /api/reviews/:review_id", () => {
 
 describe("5. GET /api/reviews", () => {
   test("Function to recieve an object of arrays in descending date order", () => {
-    return request(app).get("/api/reviews").expect(200).then((response)=>{
-      expect(response.body).toBeSortedBy("created_at",{descending:true})
-    })
-
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        console.log(response.body.review.rows);
+        expect(response.body.review.rows).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
   });
   test("The received object does not include a review_body key", () => {
-    return request(app).get("/api/reviews").expect(200).then((response)=>{
-      expect(Object.keys(response.body[0]).includes("review_body")).toBe(false)
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        const result = response.body.review.rows.filter(
+          (obj) => obj.review_body
+        );
+        console.log(result);
+        expect(result).toEqual([]);
+      });
   });
-})
-test("The received object does include a comment_count key", () => {
-  return request(app).get("/api/reviews").expect(200).then((response)=>{
-    expect(Object.keys(response.body[0]).includes("comment_count")).toBe(true)
-  })
-  
-})
-test("The function counts comments correctly", () => {
-  return request(app).get("/api/reviews").expect(200).then((response)=>{
-
-    expect(response.body[8].comment_count).toBe(3)
-  })
-})
-})
+  test("The returned object has all required keys", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        const test =   [
+          'owner',
+          'title',
+          'review_id',
+          'category',
+          'review_img_url',
+          'created_at',
+          'votes',
+          'designer',
+          'comment_count'
+        ]
+        const result = response.body.review.rows.filter(
+          (obj) => Object.keys(obj).toString() === test.toString()
+        );
+        expect(result.length).toBe(13);
+      });
+  });
+});

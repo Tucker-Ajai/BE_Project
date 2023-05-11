@@ -12,6 +12,7 @@ exports.getReview = (request, response, next) => {
 
 exports.getAllReviews = (request, response, next) => {
   fetchAllReviews().then((reviews) => {
-    response.status(200).send(reviews);
+    
+    response.status(200).send({review:reviews});
   });
 };
