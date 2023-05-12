@@ -40,14 +40,11 @@ exports.fetchReviewsComments = (id) => {
           })
           .then((result) => {
             if (!result) {
-              console.log("result");
               return Promise.reject({
                 status: 404,
                 msg: "There is no record of review ID provided",
               });
             }
-            console.log(result[0].rows);
-            // console.log(result[0].result.rows)
             return result[0].rows;
           });
       }

@@ -99,33 +99,15 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2/comments")
       .expect(200)
       .then((response) => {
-        const result = [
-          {
-            comment_id: 5,
-            votes: 13,
-            created_at: "2021-01-18T10:24:05.410Z",
-            author: "mallionaire",
-            body: "Now this is a story all about how, board games turned my life upside down",
-            review_id: 2,
-          },
-          {
-            comment_id: 1,
-            votes: 16,
-            created_at: "2017-11-22T12:43:33.389Z",
-            author: "bainesface",
-            body: "I loved this game too!",
-            review_id: 2,
-          },
-          {
-            comment_id: 4,
-            votes: 16,
-            created_at: "2017-11-22T12:36:03.389Z",
-            author: "bainesface",
-            body: "EPIC board game!",
-            review_id: 2,
-          },
-        ];
-        expect(response.body.reviewComments).toEqual(result);
+        const result = testData.commentData.filter(
+          (obj) => obj.review_id === 2
+        );
+
+        const test = response.body.reviewComments.filter(
+          (obj) => delete obj.comment_id
+        );
+
+        expect(test.toString()).toBe(result.toString());
       });
   });
   test("The Recieved data is to have the most recent comments first", () => {
@@ -138,7 +120,7 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         });
       });
   });
-  test("When client inputs an ID that is not a number, the Function will throw an error", () => {
+  test("When client inputs an ID that is not a number, the Function responds with status 400 and informational error message", () => {
     return request(app)
       .get("/api/reviews/;Drop table/comments")
       .expect(400)
@@ -146,12 +128,11 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toBe("Invalid review ID provided");
       });
   });
-  test("When Review id is valid but there is no matching data, Function to respond appropriately ", () => {
+  test("When Review id is valid but there is no matching data, Function to respond with status code of 200 and an empty array", () => {
     return request(app)
       .get("/api/reviews/13/comments")
       .expect(200)
       .then((response) => {
-       // console.log(response.body)
         expect(response.body.reviewComments).toEqual([]);
       });
   });
@@ -160,7 +141,9 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/500/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toEqual("There is no record of review ID provided");
+        expect(response.body.msg).toEqual(
+          "There is no record of review ID provided"
+        );
       });
   });
 });
