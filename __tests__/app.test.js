@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const { response } = require("../app");
 const toBeSortedBy = require("jest-sorted");
+const endpoints = require("../endpoints.json")
 
 beforeEach(() => {
   return seed(testData);
@@ -36,6 +37,20 @@ describe("3. Get /api/categories", () => {
       .expect(200)
       .then((response) => {
         expect(response.body.categories).toEqual(result);
+      });
+  });
+
+ 
+});
+
+describe("3.5 GET /api", () => {
+  test("", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(endpoints).toEqual(response.body)
+
       });
   });
 });
