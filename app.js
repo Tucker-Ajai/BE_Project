@@ -9,7 +9,7 @@ app.get("/api/categories", getCategories);
 
 app.get("/api", getApi)
 
-app.get("/api/reviews/:review_id", getReview);
+app.get("/api/reviews/:review_id", getReview)
 
 
 app.get("/api/reviews", getAllReviews)
