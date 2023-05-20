@@ -4,9 +4,8 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const { response } = require("../app");
-const endpoints = require("../endpoints.json");
-
 const toBeSortedBy = require("jest-sorted");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -89,6 +88,51 @@ describe("4. GET /api/reviews/:review_id", () => {
       .expect(200)
       .then((response) => {
         expect(response.body.msg).toBe("No matching review id");
+      });
+  });
+});
+describe("5. GET /api/reviews", () => {
+  test("Function to recieve an object of arrays in descending date order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.review.rows).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("The received object does not include a review_body key", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        const result = response.body.review.rows.filter(
+          (obj) => obj.review_body
+        );
+        expect(result).toEqual([]);
+      });
+  });
+  test("The returned object has all required keys", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((response) => {
+        const test = [
+          "owner",
+          "title",
+          "review_id",
+          "category",
+          "review_img_url",
+          "created_at",
+          "votes",
+          "designer",
+          "comment_count",
+        ];
+        const result = response.body.review.rows.filter(
+          (obj) => Object.keys(obj).toString() === test.toString()
+        );
+        expect(result.length).toBe(13);
       });
   });
 });
