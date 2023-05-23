@@ -1,4 +1,3 @@
-const format = require("pg-format");
 const db = require("../db/connection");
 
 exports.fetchReview = (id) => {
@@ -36,8 +35,7 @@ exports.fetchReviewsComments = (id) => {
         }
 
         return Promise.all([promise()])
-          .catch(() => {
-          })
+          .catch(() => {})
           .then((result) => {
             if (!result) {
               return Promise.reject({
@@ -53,11 +51,67 @@ exports.fetchReviewsComments = (id) => {
     });
 };
 
-
 exports.fetchAllReviews = () => {
-  return db.query(
-     `SELECT owner,title,reviews.review_id,category,review_img_url,reviews.created_at,reviews.votes,designer, COUNT(comments.review_id) AS comment_count FROM reviews left JOIN comments on reviews.review_id = comments.review_id group by reviews.review_id ORDER BY created_at DESC `
-   ).then((arrOfReviews) => {
-       return arrOfReviews;
-     });
- };
+  return db
+    .query(
+      `SELECT owner,title,reviews.review_id,category,review_img_url,reviews.created_at,reviews.votes,designer, COUNT(comments.review_id) AS comment_count FROM reviews left JOIN comments on reviews.review_id = comments.review_id group by reviews.review_id ORDER BY created_at DESC `
+    )
+    .then((arrOfReviews) => {
+      return arrOfReviews;
+    });
+};
+
+exports.placeAComment = ({ review_id }, { username, body }) => {
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      msg: "Required fields not been completed",
+    });
+  }
+
+  const regexNum = /^[0-9]+$/;
+  if (!regexNum.test(review_id)) {
+    return Promise.reject({ status: 400, msg: "Invalid review ID provided" });
+  }
+  return db
+    .query(
+      `INSERT INTO comments ( body, review_id,author)VALUES ( $1, $2 , $3 ) returning *;`,
+      [body, review_id, username]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    })
+    .catch((err) => {
+      if (err.constraint === "comments_author_fkey") {
+        return Promise.reject({
+          status: 400,
+          msg: "Supplied username is not registerd",
+        });
+      }
+      return err;
+    });
+};
+
+exports.changeVotes = ({ review_id }, { inc_votes }) => {
+  const regexNum = /^[0-9]+$/;
+  const regexVote = /^-[0-9]+|^[0-9]+/;
+  if (!regexNum.test(review_id)) {
+    return Promise.reject({ status: 400, msg: "Invalid review ID provided" });
+  }
+  if (!regexVote.test(inc_votes)) {
+    return Promise.reject({ status: 400, msg: "Invalid vote data provided" });
+  }
+
+  return db
+    .query(
+      `UPDATE reviews
+  SET votes = votes + $2
+  WHERE review_id = $1 returning *`,
+      [review_id, inc_votes]
+    )
+    .then((newReview) => {
+    return newReview.rows
+    }).catch((err)=>{
+      return err
+    })
+};

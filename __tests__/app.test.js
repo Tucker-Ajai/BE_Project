@@ -3,6 +3,7 @@ const request = require("supertest");
 const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
+const reviewTestData = require("../db/data/test-data/reviews.js");
 const { response } = require("../app");
 const toBeSortedBy = require("jest-sorted");
 const endpoints = require("../endpoints.json");
@@ -188,6 +189,111 @@ describe("6. GET /api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toEqual(
           "There is no record of review ID provided"
         );
+      });
+  });
+});
+
+describe("7. POST /api/reviews/:review_id/comments", () => {
+  test("Function returns object with the required keys ", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ username: "mallionaire", body: "Test Review Message" })
+      .expect(201)
+      .then((response) => {
+        const keys = [
+          "comment_id",
+          "body",
+          "review_id",
+          "author",
+          "votes",
+          "created_at",
+        ];
+        const result = Object.keys(response.body.addedComment);
+
+        expect(keys.toString()).toEqual(result.toString());
+      });
+  });
+
+  test("The values added by the client match what appears in the recieved object ", () => {
+    const username = "mallionaire";
+    const body = "Test Review Message";
+    const review_id = 1;
+    return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({ username: username, body: body })
+      .expect(201)
+      .then((response) => {
+        const object = response.body.addedComment;
+
+        expect(object.body).toBe(body);
+        expect(object.author).toBe(username);
+        expect(object.review_id).toBe(review_id);
+      });
+  });
+
+  test("When client inputs an ID that is not a number, the Function responds with status 400 and informational error message", () => {
+    return request(app)
+      .post("/api/reviews/;DROP TABLE/comments")
+      .send({ username: "mallionaire", body: "Test Review Message" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid review ID provided");
+      });
+  });
+
+  test("When the author is not a registered user, the function will respond with informational error", () => {
+    const username = "Aaron";
+    const body = "Test Review Message";
+    const review_id = 1;
+    return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({ username: username, body: body })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Supplied username is not registerd");
+      });
+  });
+
+  test("When client does not provide a comment, error is trown informing of this", () => {
+    const username = "mallionaire";
+    const review_id = 1;
+    return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({ username: username })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Required fields not been completed");
+      });
+  });
+  test("When client does not provide a username, error is trown informing of this", () => {
+    const body = "Test comment text";
+    const review_id = 1;
+    return request(app)
+      .post(`/api/reviews/${review_id}/comments`)
+      .send({ body: body })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Required fields not been completed");
+      });
+  });
+});
+
+describe("8. PATCH /api/reviews/:review_id", () => {
+  test("Function returns object with updated review value", () => {
+
+    let original = ""
+    let update = ""
+    return request(app)
+      .get("/api/reviews/1").then((response)=>{original = response.body;
+        }).then((response) => {
+          return request(app)
+        .patch("/api/reviews/1")
+        .send({ inc_votes: -100 })
+        .expect(200).then((response)=>{
+          update = response.body.editedReview[0]
+expect(original.votes -= 100).toBe(update.votes)
+        })
+
       });
   });
 });
