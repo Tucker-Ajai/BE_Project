@@ -29,7 +29,7 @@ exports.getReviewsComments = (request, response, next) => {
 };
 
 exports.getAllReviews = (request, response, next) => {
-  fetchAllReviews().then((reviews) => {
+  fetchAllReviews(request.query).then((reviews) => {
     response.status(200).send({ review: reviews });
   });
 };
@@ -47,10 +47,9 @@ exports.postAComment = (request, response, next) => {
 exports.updateVotes = (request, response, next) => {
   changeVotes(request.params, request.body)
     .then((editedReview) => {
-      response.status(200).send({editedReview});
+      response.status(200).send({ editedReview });
     })
     .catch((err) => {
       next(err);
     });
- 
 };

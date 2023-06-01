@@ -3,6 +3,7 @@ const express = require("express");
 const { getApi } = require("./Controllers/api.controller");
 const { getCategories } = require("./Controllers/catergories.controller");
 const { getReview, getReviewsComments, getAllReviews, postAComment, updateVotes } = require("./Controllers/review.controller");
+const { removeComment } = require('./Controllers/comments.controller');
 const app = express();
 app.use(cors());
 
@@ -22,6 +23,8 @@ app.get("/api/reviews/:review_id/comments",getReviewsComments)
 app.post("/api/reviews/:review_id/comments", postAComment)
 
 app.patch("/api/reviews/:review_id", updateVotes)
+
+app.delete("/api/comments/:comment_id",removeComment)
 
 
 app.use((err, request, response, next) => {
@@ -50,5 +53,6 @@ app.use((err, request, response, next) => {
     next(err);
   }
 });
+
 
 module.exports = app;

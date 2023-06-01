@@ -51,14 +51,24 @@ exports.fetchReviewsComments = (id) => {
     });
 };
 
-exports.fetchAllReviews = () => {
-  return db
-    .query(
-      `SELECT owner,title,reviews.review_id,category,review_img_url,reviews.created_at,reviews.votes,designer, COUNT(comments.review_id) AS comment_count FROM reviews left JOIN comments on reviews.review_id = comments.review_id group by reviews.review_id ORDER BY created_at DESC `
-    )
-    .then((arrOfReviews) => {
-      return arrOfReviews;
-    });
+exports.fetchAllReviews = (options) => {
+  return (
+    db
+
+      // LOOK AT PLAYGROUND JS. DRAFT FOR CONDITIONALS THERE. ALWAYS HAVE A WHERE STATEMENT THEN ADD ANDS AS NEEDED
+      .query(
+        `SELECT owner,title,reviews.review_id,category,review_img_url,reviews.created_at,reviews.votes,designer, COUNT(comments.review_id) AS comment_count FROM reviews left JOIN comments on reviews.review_id = comments.review_id WHERE title LIKE '%' ${
+          options.category ? `AND category = '${options.category}' ` : ""
+        }
+      
+      GROUP BY reviews.review_id ORDER BY ${options.sort_by? options.sort_by: "created_at" } ${
+        options.order ? `${options.order}` : "DESC"
+      }`
+      )
+      .then((arrOfReviews) => {
+        return arrOfReviews;
+      })
+  );
 };
 
 exports.placeAComment = ({ review_id }, { username, body }) => {
@@ -110,8 +120,9 @@ exports.changeVotes = ({ review_id }, { inc_votes }) => {
       [review_id, inc_votes]
     )
     .then((newReview) => {
-    return newReview.rows
-    }).catch((err)=>{
-      return err
+      return newReview.rows;
     })
+    .catch((err) => {
+      return err;
+    });
 };
