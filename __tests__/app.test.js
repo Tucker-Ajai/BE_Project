@@ -280,20 +280,42 @@ describe("7. POST /api/reviews/:review_id/comments", () => {
 
 describe("8. PATCH /api/reviews/:review_id", () => {
   test("Function returns object with updated review value", () => {
-
-    let original = ""
-    let update = ""
+    let original = "";
+    let update = "";
     return request(app)
-      .get("/api/reviews/1").then((response)=>{original = response.body;
-        }).then((response) => {
-          return request(app)
-        .patch("/api/reviews/1")
-        .send({ inc_votes: -100 })
-        .expect(200).then((response)=>{
-          update = response.body.editedReview[0]
-expect(original.votes -= 100).toBe(update.votes)
-        })
-
+      .get("/api/reviews/1")
+      .then((response) => {
+        original = response.body;
+      })
+      .then((response) => {
+        return request(app)
+          .patch("/api/reviews/1")
+          .send({ inc_votes: -100 })
+          .expect(200)
+          .then((response) => {
+            update = response.body.editedReview[0];
+            expect((original.votes -= 100)).toBe(update.votes);
+          });
       });
   });
 });
+
+describe("9. DELETE /api/comments/:comment_id", () => {
+  test("Deletes comment", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then((response) => {
+        expect(response.text).toBe("")
+      
+      });
+  });
+});
+
+
+
+describe("11. GET /api/reviews (queries)",()=>{
+  test("",()=>{
+return request(app).get("/api/reviews?sort_by=votes&order=asc")
+  })
+})
